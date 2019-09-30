@@ -5,15 +5,15 @@ const handler = require('./handler')
 
 Sentry.init({ dsn: process.env.SENTRY_KEY })
 
-exports.handler = async ({ path }, context, callback) => {
+exports.handler = async ({ path, headers, body }, context, callback) => {
   try {
-    const body = await handler(path)
+    const response = await handler(path, headers, body)
     callback(null, {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(response)
     })
   } catch (error) {
     console.log(error)

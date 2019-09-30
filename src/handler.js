@@ -1,3 +1,3 @@
-module.exports = async (path) => {
-  return { path }
+module.exports = async (path, headers, body) => {
+  return { path, headers, body }
 }
