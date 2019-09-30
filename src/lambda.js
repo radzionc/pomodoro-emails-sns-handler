@@ -13,7 +13,7 @@ exports.handler = async ({ path }, context, callback) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body
+      body: JSON.stringify(body)
     })
   } catch (error) {
     console.log(error)
