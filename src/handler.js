@@ -14,7 +14,7 @@ function subscribeSNS() {
   this.subscribed = true
   return Promise.all(
     [['TOPIC_ARN_BOUNCE', 'bounce'], ['TOPIC_ARN_COMPLAINT', 'complaint']]
-    .map((envKey, route) => sns.subscribe(getTopicParams(process.env[envKey], route)).promise())
+    .map(([envKey, route]) => sns.subscribe(getTopicParams(process.env[envKey], route)).promise())
   )
 }
 
