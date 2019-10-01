@@ -1,30 +1,25 @@
-const AWS = require("aws-sdk")
-
-const sns = new AWS.SNS()
-
-const getTopicParams = (arn, route) => ({
-  Protocol: 'https',
-  TopicArn: arn,
-  Endpoint: `https://${process.env.DOMAIN}/${route}`
-})
-
-function subscribeSNS() {
-  if(this.subscribed) return
-
-  this.subscribed = true
-  return Promise.all(
-    [['TOPIC_ARN_BOUNCE', 'bounce'], ['TOPIC_ARN_COMPLAINT', 'complaint']]
-    .map(([envKey, route]) => sns.subscribe(getTopicParams(process.env[envKey], route)).promise())
-  )
-}
+const { stopSendingNewsTo } = require('./users')
+const { TOPIC_ARN } = require('./constants')
+const { getSubscribedSns } = require('./sns')
 
 module.exports = async (path, headers, body) => {
-  console.log(path, headers, body)
-  await subscribeSNS()
-  
-  return {
-    DOMAIN: process.env.DOMAIN,
-    TOPIC_ARN_BOUNCE: process.env.TOPIC_ARN_BOUNCE,
-    TOPIC_ARN_COMPLAINT: process.env.TOPIC_ARN_COMPLAINT
+  const sns = await getSubscribedSns()
+  const messageType = headers['x-amz-sns-message-type']
+  if (messageType === 'Notification' && body.Message) {
+    const message = JSON.parse(body.Message)
+    const { notificationType, mail } = message
+    if (['Bounce', 'Complaint'].includes(notificationType) && mail) {
+      await Promise.all(mail.destination.map(stopSendingNewsTo))
+    }
+  } else if (messageType === 'SubscriptionConfirmation') {
+    const route = path.split('/')[1]
+    const topicArn = TOPIC_ARN[route]
+    if (!topicArn) {
+      throw new Error(`Invalid route: ${route}`)
+    }
+    await sns.confirmSubscription({
+      Token: body.Token,
+      TopicArn: topicArn
+    }).promise()
   }
 }

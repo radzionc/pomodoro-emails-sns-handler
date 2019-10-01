@@ -7,14 +7,7 @@ Sentry.init({ dsn: process.env.SENTRY_KEY })
 
 exports.handler = async ({ path, headers, body }, context, callback) => {
   try {
-    const response = await handler(path, headers, body)
-    callback(null, {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(response)
-    })
+    await handler(path, headers, body)
   } catch (error) {
     console.log(error)
     Sentry.withScope(scope => {
@@ -23,4 +16,11 @@ exports.handler = async ({ path, headers, body }, context, callback) => {
     })
     await Sentry.flush()
   }
+  callback(null, {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: '{}'
+  })
 }
