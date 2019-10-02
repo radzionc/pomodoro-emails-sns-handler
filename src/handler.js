@@ -3,6 +3,8 @@ const { TOPIC_ARN } = require('./constants')
 const { getSubscribedSns } = require('./sns')
 
 module.exports = async (path, headers, body) => {
+  console.log(body)
+  console.log(headers)
   const sns = await getSubscribedSns()
   const messageType = headers['x-amz-sns-message-type']
   if (messageType === 'Notification' && body.Message) {
