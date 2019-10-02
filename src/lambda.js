@@ -7,7 +7,7 @@ Sentry.init({ dsn: process.env.SENTRY_KEY })
 
 exports.handler = async ({ path, headers, body }, context, callback) => {
   try {
-    await handler(path, headers, body)
+    await handler(path, headers, JSON.parse(body))
   } catch (error) {
     console.log(error)
     Sentry.withScope(scope => {
