@@ -1,6 +1,5 @@
 const { documentClient, setNewValue, mergedParams, searchByKeyParams, projectionExpression } = require('awsdynamoutils')
 
-
 const USERS_TABLE = 'pomodoro_users'
 
 const userDefaultParams = id => ({

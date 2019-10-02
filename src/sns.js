@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 
-const { TOPIC_ARN } = require('constants')
+const { TOPIC_ARN } = require('./constants')
 
 let sns = null
 
