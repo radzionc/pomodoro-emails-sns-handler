@@ -18,7 +18,7 @@ module.exports = {
       })
       await Promise.all(
         Object.entries(TOPIC_ARN)
-        .map(([envKey, route]) => sns.subscribe(getTopicParams(process.env[envKey], route)).promise())
+        .map(([arn, route]) => sns.subscribe(getTopicParams(arn, route)).promise())
       )
     }
     return sns
