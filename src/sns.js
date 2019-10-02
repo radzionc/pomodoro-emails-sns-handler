@@ -13,7 +13,9 @@ const getTopicParams = (arn, route) => ({
 module.exports = {
   getSubscribedSns: async () => {
     if (!sns) {
-      sns = new AWS.SNS()
+      sns = new AWS.SNS({
+        region: 'us-east-1'
+      })
       await Promise.all(
         Object.entries(TOPIC_ARN)
         .map(([envKey, route]) => sns.subscribe(getTopicParams(process.env[envKey], route)).promise())
