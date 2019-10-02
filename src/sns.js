@@ -18,7 +18,7 @@ module.exports = {
       })
       await Promise.all(
         Object.entries(TOPIC_ARN)
-        .map(([arn, route]) => sns.subscribe(getTopicParams(arn, route)).promise())
+        .map(([route,  arn]) => sns.subscribe(getTopicParams(arn, route)).promise())
       )
     }
     return sns
