@@ -7,7 +7,7 @@ let sns = null
 const getTopicParams = (arn, route) => ({
   Protocol: 'https',
   TopicArn: arn,
-  Endpoint: `https://${process.env.DOMAIN}/${route}`
+  Endpoint: `${process.env.DOMAIN}/${route}`
 })
 
 module.exports = {
