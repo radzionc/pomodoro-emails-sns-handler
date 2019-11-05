@@ -1,4 +1,3 @@
-  
 const Sentry =  require('@sentry/node')
 
 const handler = require('./handler')
