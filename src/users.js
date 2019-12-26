@@ -20,8 +20,8 @@ const getByEmail = (email, attributes = undefined) =>
     .then(data => data.Items[0])
 
 module.exports = {
-  stopSendingNewsTo: async (email) => {
+  stopSendingEmailsTo: async (email) => {
     const { id } = await getByEmail(email, ['id'])
-    await setNewValue(userDefaultParams(id), 'ignorePomodoroNews', true)
+    await setNewValue(userDefaultParams(id), 'ignoreEmails', true)
   }
 }

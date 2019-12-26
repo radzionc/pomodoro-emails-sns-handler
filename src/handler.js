@@ -1,4 +1,4 @@
-const { stopSendingNewsTo } = require('./users')
+const { stopSendingEmailsTo } = require('./users')
 const { TOPIC_ARN } = require('./constants')
 const { getSubscribedSns } = require('./sns')
 
@@ -8,7 +8,7 @@ module.exports = async (path, headers, body) => {
     const message = JSON.parse(body.Message)
     const { notificationType, mail } = message
     if (['Bounce', 'Complaint'].includes(notificationType) && mail) {
-      await Promise.all(mail.destination.map(stopSendingNewsTo))
+      await Promise.all(mail.destination.map(stopSendingEmailsTo))
     }
   } else if (messageType === 'SubscriptionConfirmation') {
     const route = path.split('/')[1]
