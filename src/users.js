@@ -1,4 +1,6 @@
-const { documentClient, setNewValue, mergedParams, searchByKeyParams, projectionExpression } = require('awsdynamoutils')
+const Sentry =  require('@sentry/node')
+
+const { setNewValue, mergedParams, searchByKeyParams, projectionExpression, paginationAware } = require('awsdynamoutils')
 
 const USERS_TABLE = 'pomodoro_users'
 
@@ -7,21 +9,26 @@ const userDefaultParams = id => ({
   Key: { id }
 })
 
+const scan = paginationAware('scan')
+
 const getByEmail = (email, attributes = undefined) =>
-  documentClient
-    .scan(
-      mergedParams(
-        { TableName: USERS_TABLE },
-        searchByKeyParams('email', email),
-        projectionExpression(attributes)
-      )
+  scan(
+    mergedParams(
+      { TableName: USERS_TABLE },
+      searchByKeyParams('email', email),
+      projectionExpression(attributes)
     )
-    .promise()
-    .then(data => data.Items[0])
+  )
+  .then(items => items[0])
 
 module.exports = {
   stopSendingEmailsTo: async (email) => {
-    const { id } = await getByEmail(email, ['id'])
-    await setNewValue(userDefaultParams(id), 'ignoreEmails', true)
+    const user = await getByEmail(email, ['id'])
+    if (user) {
+      await setNewValue(userDefaultParams(user.id), 'ignoreEmails', true)
+    } else {
+      Sentry.captureMessage(`No ${email} user found`)
+      await Sentry.flush(1000)
+    }
   }
 }
