@@ -1,19 +1,17 @@
 const Sentry =  require('@sentry/node')
+const { getReportError } = require('increaser-utils')
 
 const handler = require('./handler')
 
 Sentry.init({ dsn: process.env.SENTRY_KEY })
 
+const reportError = getReportError(Sentry, [], 2000)
+
 exports.handler = async ({ path, headers, body }, context, callback) => {
   try {
     await handler(path, headers, JSON.parse(body))
   } catch (error) {
-    console.log(error)
-    Sentry.withScope(scope => {
-      scope.setExtra('path', path)
-      Sentry.captureException(error)
-    })
-    await Sentry.flush()
+    await reportError('Fail to process', { path }, error)
   }
   callback(null, {
     statusCode: 200,
